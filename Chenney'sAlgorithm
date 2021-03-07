@@ -1,0 +1,13 @@
+Cheney's algorithm reclaims items as follows:
+
+Object references on the stack. Object references on the stack are checked. One of the two following actions is taken for each object reference that points to an object in from-space:
+If the object has not yet been moved to the to-space, this is done by creating an identical copy in the to-space, and then replacing the from-space version with a forwarding pointer to the to-space copy. Then update the object reference to refer to the new version in to-space.
+If the object has already been moved to the to-space, simply update the reference from the forwarding pointer in from-space.
+Objects in the to-space. The garbage collector examines all object references in the objects that have been migrated to the to-space, and performs one of the above two actions on the referenced objects.
+Once all to-space references have been examined and updated, garbage collection is complete.
+
+The algorithm needs no stack and only two pointers outside of the from-space and to-space: a pointer to the beginning of free space in the to-space, and a pointer to the next word in to-space that needs to be examined. For this reason, it is sometimes called a "two-finger" collector—it only needs "two fingers" pointing into the to-space to keep track of its state. The data between the two fingers represents work remaining for it to do.
+
+The forwarding pointer (sometimes called a "broken heart") is used only during the garbage collection process; when a reference to an object already in to-space (thus having a forwarding pointer in from-space) is found, the reference can be updated quickly simply by updating its pointer to match the forwarding pointer.
+
+Because the strategy is to exhaust all live references, and then all references in referenced objects, this is known as a breadth-first list copying garbage collection scheme.
